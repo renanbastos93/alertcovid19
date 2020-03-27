@@ -1,4 +1,4 @@
-module alertcovid19
+module github.com/renanbastos93/alertcovid19
 
 go 1.14
 
