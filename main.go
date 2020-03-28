@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -44,27 +45,38 @@ func (l *LastValues) String() string {
 }
 
 // GetDataCOVID19 ...
-func GetDataCOVID19() (currentValue LastValues, err error) {
+func GetDataCOVID19(ctx context.Context) (*LastValues, error) {
 	res, err := http.Get(URL)
 	if err != nil {
-		return
+		return nil, err
 	}
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return
+	errCh := make(chan error, 1)
+	respCh := make(chan LastValues, 1)
+	go func() {
+		body, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			errCh <- err
+		}
+		var resp *response
+		err = json.Unmarshal(body, &resp)
+		if err != nil {
+			errCh <- err
+		}
+		respCh <- LastValues{
+			Confirmed: resp.Data.Confirmed,
+			Deaths:    resp.Data.Deaths,
+			Recovered: resp.Data.Recovered,
+			UpdatedAt: time.Now(),
+		}
+	}()
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	case err = <-errCh:
+		return nil, err
+	case resp := <-respCh:
+		return &resp, nil
 	}
-	var resp *response
-	err = json.Unmarshal(body, &resp)
-	if err != nil {
-		return
-	}
-	currentValue = LastValues{
-		Confirmed: resp.Data.Confirmed,
-		Deaths:    resp.Data.Deaths,
-		Recovered: resp.Data.Recovered,
-		UpdatedAt: time.Now(),
-	}
-	return
 }
 
 // CompareInfos ...
@@ -79,17 +91,19 @@ func CompareInfos(currentValues LastValues) bool {
 
 func routine(duration time.Duration) {
 	for {
-		currentValue, err := GetDataCOVID19()
+		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		defer cancel()
+		currentValue, err := GetDataCOVID19(ctx)
 		if err != nil {
 			panic(err)
 		}
 
-		if CompareInfos(currentValue) {
+		if CompareInfos(*currentValue) {
 			err := beeep.Alert("COVID-19 Brazil", currentValue.String(), IMG)
 			if err != nil {
 				panic(err)
 			}
-			lastValues = currentValue
+			lastValues = *currentValue
 		}
 		fmt.Println("opa time? ", duration, *timer)
 		time.Sleep(duration * time.Second)
