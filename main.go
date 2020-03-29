@@ -16,10 +16,6 @@ var (
 	timer = flag.Int64("timer", 3600, "This parameter define time in seconds to verify API ")
 )
 
-func init() {
-	flag.Parse()
-}
-
 // LastValues ...
 type LastValues struct {
 	Confirmed uint `json"confirmed"`
@@ -111,6 +107,7 @@ func routine(duration time.Duration) {
 }
 
 func main() {
+	flag.Parse()
 	lastValues = LastValues{}
 	routine(time.Duration(*timer))
 }
