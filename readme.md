@@ -11,7 +11,7 @@ We are currently using this [COVID19-BRAZIL-API](https://covid19-brazil-api-docs
 ### Usage
 ```bash
 $ make <macos|linux|windows>  # if it's the window you can to run "make zip"
-$ ./alertcovid19 -timer=10    # 10 seconds
+$ ./alertcovid19 -t 10s    # 10 seconds
 $ make clean
 ```
 

@@ -5,15 +5,18 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gen2brain/beeep"
 )
 
-var (
-	timer = flag.Duration("timer", time.Hour, "This parameter define time to verify API ")
+// Exported ...
+const (
+	IMG string = "https://static.poder360.com.br/2020/03/23312-868x644.png"
+	URL        = "https://covid19-brazil-api.now.sh/api/report/v1/brazil"
 )
 
 // LastValues ...
@@ -21,81 +24,71 @@ type LastValues struct {
 	Confirmed int `json:"confirmed"`
 	Deaths    int `json:"deaths"`
 	Recovered int `json:"recovered"`
-	// UpdatedAt time.Time XXX: move somewhere else
 }
 
-type response struct {
-	Data LastValues `json:"data"`
-}
-
-var lastValues LastValues
-
-// Exported ...
-const (
-	URL string = "https://covid19-brazil-api.now.sh/api/report/v1/brazil"
-	IMG string = "https://static.poder360.com.br/2020/03/23312-868x644.png"
-)
-
-func (l *LastValues) String() string {
+func (l LastValues) String() string {
 	return fmt.Sprintf("Confirmed: %d, Deaths: %d, Recovered: %d", l.Confirmed, l.Deaths, l.Recovered)
 }
 
-// GetDataCOVID19 ...
-func GetDataCOVID19(ctx context.Context) (*LastValues, error) {
-	res, err := http.Get(URL)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-	errCh := make(chan error, 1)
-	respCh := make(chan LastValues, 1)
+// fetchCOVID19Data ...
+func fetchCOVID19Data(ctx context.Context, req *http.Request) <-chan LastValues {
+	ch := make(chan LastValues)
 	go func() {
-		body, err := ioutil.ReadAll(res.Body)
-		if err != nil {
-			errCh <- err
+		var r struct {
+			Data LastValues `json:"data"`
 		}
-		var resp response
-		err = json.Unmarshal(body, &resp)
+		body, err := http.DefaultClient.Do(req)
 		if err != nil {
-			errCh <- err
+			log.Printf("fetchCOVID19Data: %v", err)
+			return
 		}
-		respCh <- LastValues{
-			Confirmed: resp.Data.Confirmed,
-			Deaths:    resp.Data.Deaths,
-			Recovered: resp.Data.Recovered,
+		defer body.Body.Close()
+		err = json.NewDecoder(body.Body).Decode(&r)
+		if err != nil {
+			log.Printf("fetchCOVID19Data: %v", err)
+			return
+		}
+
+		select {
+		case ch <- LastValues{r.Data.Confirmed, r.Data.Deaths, r.Data.Recovered}:
+		case <-ctx.Done():
 		}
 	}()
-	select {
-	case <-ctx.Done():
-		return nil, ctx.Err()
-	case err = <-errCh:
-		return nil, err
-	case resp := <-respCh:
-		return &resp, nil
-	}
+	return ch
 }
 
-func routine(duration time.Duration) {
+func routine(sleep time.Duration) {
+	cachedVal := LastValues{}
 	const timeout = time.Second * 2
-	for ctx, cancel := context.WithTimeout(context.Background(), timeout); ; cancel() {
-		currentValue, err := GetDataCOVID19(ctx)
+	for {
+		ctx, cancel := context.WithTimeout(context.Background(), timeout)
+		req, err := http.NewRequestWithContext(ctx, "GET", URL, nil)
 		if err != nil {
-			panic(err)
+			panic("internal error - misuse of NewRequestWithContext")
 		}
-
-		if lastValues == *currentValue {
-			err := beeep.Alert("COVID-19 Brazil", currentValue.String(), IMG)
-			if err != nil {
-				panic(err)
+		select {
+		case newVal := <-fetchCOVID19Data(ctx, req):
+			if cachedVal != newVal {
+				err := beeep.Alert("COVID-19 Brazil", newVal.String(), IMG)
+				if err != nil {
+					log.Printf("rountine: %v", err)
+				}
+				cachedVal = newVal
 			}
-			lastValues = *currentValue
+		case <-ctx.Done():
+			log.Printf("rountine: %v", ctx.Err())
 		}
-		fmt.Println("opa time? ", duration, *timer)
-		time.Sleep(duration)
+		cancel()
+		log.Printf("sleeping for %s", sleep)
+		time.Sleep(sleep)
 	}
 }
 
 func main() {
+	log.SetPrefix(os.Args[0] + ": ")
+	log.SetFlags(0)
+	var timer time.Duration
+	flag.DurationVar(&timer, "t", time.Hour, "interval between each api request")
 	flag.Parse()
-	routine(time.Duration(*timer))
+	routine(timer)
 }
