@@ -46,6 +46,7 @@ func GetDataCOVID19(ctx context.Context) (*LastValues, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer res.Body.Close()
 	errCh := make(chan error, 1)
 	respCh := make(chan LastValues, 1)
 	go func() {
