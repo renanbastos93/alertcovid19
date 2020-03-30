@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	timer = flag.Int64("timer", 3600, "This parameter define time in seconds to verify API ")
+	timer = flag.Duration("timer", time.Hour, "This parameter define time to verify API ")
 )
 
 // LastValues ...
@@ -102,7 +102,7 @@ func routine(duration time.Duration) {
 			lastValues = *currentValue
 		}
 		fmt.Println("opa time? ", duration, *timer)
-		time.Sleep(duration * time.Second)
+		time.Sleep(duration)
 	}
 }
 
