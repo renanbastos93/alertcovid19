@@ -2,43 +2,7 @@ package main
 
 import (
 	"testing"
-	"time"
 )
-
-func TestCompareInfos(t *testing.T) {
-	lastValues := &LastValues{
-		Confirmed: 1,
-		Deaths:    0,
-		Recovered: 0,
-		UpdatedAt: time.Now(),
-	}
-	type args struct {
-		currentValues LastValues
-	}
-	tests := []struct {
-		name string
-		args args
-		want bool
-	}{
-		{
-			name: "Test Compare Infos returns true",
-			args: args{currentValues: *lastValues},
-			want: true,
-		},
-		{
-			name: "Test Compare Infos returns false",
-			args: args{currentValues: LastValues{}},
-			want: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := CompareInfos(tt.args.currentValues); got != tt.want {
-				t.Errorf("CompareInfos() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
 
 func TestLastValues_String(t *testing.T) {
 	type fields struct {

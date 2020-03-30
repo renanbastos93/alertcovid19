@@ -21,7 +21,7 @@ type LastValues struct {
 	Confirmed uint `json:"confirmed"`
 	Deaths    uint `json:"deaths"`
 	Recovered uint `json:"recovered"`
-	UpdatedAt time.Time
+	// UpdatedAt time.Time XXX: move somewhere else
 }
 
 type response struct {
@@ -62,7 +62,6 @@ func GetDataCOVID19(ctx context.Context) (*LastValues, error) {
 			Confirmed: resp.Data.Confirmed,
 			Deaths:    resp.Data.Deaths,
 			Recovered: resp.Data.Recovered,
-			UpdatedAt: time.Now(),
 		}
 	}()
 	select {
@@ -75,16 +74,6 @@ func GetDataCOVID19(ctx context.Context) (*LastValues, error) {
 	}
 }
 
-// CompareInfos ...
-func CompareInfos(currentValues LastValues) bool {
-	if lastValues.Confirmed != currentValues.Confirmed ||
-		lastValues.Deaths != currentValues.Deaths ||
-		lastValues.Recovered != currentValues.Recovered {
-		return true
-	}
-	return false
-}
-
 func routine(duration time.Duration) {
 	const timeout = time.Second * 2
 	for ctx, cancel := context.WithTimeout(context.Background(), timeout); ; cancel() {
@@ -93,7 +82,7 @@ func routine(duration time.Duration) {
 			panic(err)
 		}
 
-		if CompareInfos(*currentValue) {
+		if lastValues == *currentValue {
 			err := beeep.Alert("COVID-19 Brazil", currentValue.String(), IMG)
 			if err != nil {
 				panic(err)
