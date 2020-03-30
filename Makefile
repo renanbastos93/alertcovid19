@@ -16,19 +16,20 @@ lint:
 	$(GOLINT) ./...
 
 format:
-	$(GO)fmt -w .	
+	$(GO) fmt ./...
 
 macos:
-	GOOS=darwin GOARCH=amd64 $(GO) build -o alertcovid19 main.go
+	GOOS=darwin GOARCH=amd64 $(GO) build
 
 linux:
-	GOOS=linux GOARCH=amd64 $(GO) build -o alertcovid19 main.go
+	GOOS=linux GOARCH=amd64 $(GO) build -tags 'osusergo netgo static_build'
 	
 windows:
-	GOOS=windows GOARCH=amd64 $(GO) build -o alertcovid19.exe main.go
+	GOOS=windows GOARCH=amd64 $(GO) build
 
 zip:
 	zip alertcovid19_windows.zip alertcovid19.exe
 
 clean:
 	rm -f alertcovid19 alertcovid19.exe alertcovid19_windows.zip coverage.html
+
