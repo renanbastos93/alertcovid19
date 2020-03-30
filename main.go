@@ -53,7 +53,7 @@ func GetDataCOVID19(ctx context.Context) (*LastValues, error) {
 		if err != nil {
 			errCh <- err
 		}
-		var resp *response
+		var resp response
 		err = json.Unmarshal(body, &resp)
 		if err != nil {
 			errCh <- err
