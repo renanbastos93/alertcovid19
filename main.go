@@ -18,9 +18,9 @@ var (
 
 // LastValues ...
 type LastValues struct {
-	Confirmed uint `json"confirmed"`
-	Deaths    uint `json"deaths"`
-	Recovered uint `json"recovered"`
+	Confirmed uint `json:"confirmed"`
+	Deaths    uint `json:"deaths"`
+	Recovered uint `json:"recovered"`
 	UpdatedAt time.Time
 }
 
