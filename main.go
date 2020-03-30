@@ -86,9 +86,8 @@ func CompareInfos(currentValues LastValues) bool {
 }
 
 func routine(duration time.Duration) {
-	for {
-		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-		defer cancel()
+	const timeout = time.Second * 2
+	for ctx, cancel := context.WithTimeout(context.Background(), timeout); ; cancel() {
 		currentValue, err := GetDataCOVID19(ctx)
 		if err != nil {
 			panic(err)
