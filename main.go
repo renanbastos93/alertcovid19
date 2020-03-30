@@ -107,6 +107,5 @@ func routine(duration time.Duration) {
 
 func main() {
 	flag.Parse()
-	lastValues = LastValues{}
 	routine(time.Duration(*timer))
 }
