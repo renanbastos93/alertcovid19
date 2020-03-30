@@ -18,9 +18,9 @@ var (
 
 // LastValues ...
 type LastValues struct {
-	Confirmed uint `json:"confirmed"`
-	Deaths    uint `json:"deaths"`
-	Recovered uint `json:"recovered"`
+	Confirmed int `json:"confirmed"`
+	Deaths    int `json:"deaths"`
+	Recovered int `json:"recovered"`
 	// UpdatedAt time.Time XXX: move somewhere else
 }
 
