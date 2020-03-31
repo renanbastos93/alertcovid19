@@ -30,30 +30,39 @@ func (l LastValues) String() string {
 	return fmt.Sprintf("Confirmed: %d, Deaths: %d, Recovered: %d", l.Confirmed, l.Deaths, l.Recovered)
 }
 
-// fetchCOVID19Data ...
-func fetchCOVID19Data(ctx context.Context, req *http.Request) <-chan LastValues {
-	ch := make(chan LastValues)
-	go func() {
-		var r struct {
-			Data LastValues `json:"data"`
-		}
-		body, err := http.DefaultClient.Do(req)
-		if err != nil {
-			log.Printf("fetchCOVID19Data: %v", err)
-			return
-		}
-		defer body.Body.Close()
-		err = json.NewDecoder(body.Body).Decode(&r)
-		if err != nil {
-			log.Printf("fetchCOVID19Data: %v", err)
-			return
-		}
+// fetch runs on its own goroutine
+func fetch(ctx context.Context, req *http.Request, ch chan LastValues) error {
+	defer close(ch)
+	var r struct {
+		Data LastValues `json:"data"`
+	}
+	body, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.Printf("fetchCOVID19Data: %v", err)
+		return err
+	}
+	defer body.Body.Close()
+	err = json.NewDecoder(body.Body).Decode(&r)
+	if err != nil {
+		log.Printf("fetchCOVID19Data: %v", err)
+		return err
+	}
 
-		select {
-		case ch <- LastValues{r.Data.Confirmed, r.Data.Deaths, r.Data.Recovered}:
-		case <-ctx.Done():
-		}
-	}()
+	select {
+	case ch <- LastValues{r.Data.Confirmed, r.Data.Deaths, r.Data.Recovered}:
+	case <-ctx.Done():
+	}
+	return nil
+}
+
+// fetchCOVID19Data ...
+func fetchCOVID19Data(ctx context.Context) <-chan LastValues {
+	ch := make(chan LastValues)
+	req, err := http.NewRequestWithContext(ctx, "GET", URL, nil)
+	if err != nil {
+		panic("internal error - misuse of NewRequestWithContext")
+	}
+	go fetch(ctx, req, ch)
 	return ch
 }
 
@@ -62,12 +71,8 @@ func routine(sleep time.Duration) {
 	const timeout = time.Second * 2
 	for {
 		ctx, cancel := context.WithTimeout(context.Background(), timeout)
-		req, err := http.NewRequestWithContext(ctx, "GET", URL, nil)
-		if err != nil {
-			panic("internal error - misuse of NewRequestWithContext")
-		}
 		select {
-		case newVal := <-fetchCOVID19Data(ctx, req):
+		case newVal := <-fetchCOVID19Data(ctx):
 			if cachedVal != newVal {
 				err := beeep.Alert("COVID-19 Brazil", newVal.String(), IMG)
 				if err != nil {
