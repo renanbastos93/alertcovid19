@@ -1,7 +1,7 @@
 on: [push, pull_request]
 name: Go Test
 jobs:
-  test:
+  Test:
     strategy:
       matrix:
         go-version: [1.13.x, 1.14.x]
