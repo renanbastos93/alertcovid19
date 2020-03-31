@@ -89,11 +89,21 @@ func routine(sleep time.Duration) {
 	}
 }
 
+func flags(timer *time.Duration, state *string) {
+	flag.DurationVar(timer, "t", time.Hour, "interval between each api request")
+	flag.StringVar(state, "state", "-", "Chose your filter state")
+	flag.Parse()
+}
+
+type myFlags interface{}
+
 func main() {
 	log.SetPrefix(os.Args[0] + ": ")
 	log.SetFlags(0)
-	var timer time.Duration
-	flag.DurationVar(&timer, "t", time.Hour, "interval between each api request")
-	flag.Parse()
+	var (
+		timer time.Duration
+		state string
+	)
+	flags(&timer, &state)
 	routine(timer)
 }

@@ -1,5 +1,9 @@
 github.com/gen2brain/beeep v0.0.0-20200305193625-ff0f4a39397e h1:HCCLqGqQVEWSg6VnLpwkUM33ntwc7I/wQnH6C1F+dKY=
 github.com/gen2brain/beeep v0.0.0-20200305193625-ff0f4a39397e/go.mod h1:X4dJnVSeloSkLGKFiuwglrl9cJknASsBsJ1v5oOSf2k=
+github.com/gocarina/gocsv v0.0.0-20200324105150-9eab084b7a45 h1:qvwLAjTsN/G4YvphQxrda+DmbPfpKYg4K3Je9LH6gxQ=
+github.com/gocarina/gocsv v0.0.0-20200324105150-9eab084b7a45/go.mod h1:5YoVOkjYAQumqlV356Hj3xeYh4BdZuLE0/nRkf2NKkI=
+github.com/gocarina/gocsv v0.0.0-20200330101823-46266ca37bd3 h1:B7k6N+JlLM/u1xrIkpifUfE7GRJsZIYHoHbiAa5cSP4=
+github.com/gocarina/gocsv v0.0.0-20200330101823-46266ca37bd3/go.mod h1:5YoVOkjYAQumqlV356Hj3xeYh4BdZuLE0/nRkf2NKkI=
 github.com/godbus/dbus v4.1.0+incompatible h1:WqqLRTsQic3apZUK9qC5sGNfXthmPXzUZ7nQPrNITa4=
 github.com/godbus/dbus v4.1.0+incompatible/go.mod h1:/YcGZj5zSblfDWMMoOzV4fas9FZnQYTkDnsGvmh2Grw=
 github.com/gopherjs/gopherjs v0.0.0-20180825215210-0210a2f0f73c h1:16eHWuMGvCjSfgRJKqIzapE78onvvTbdi1rMkU00lZw=
@@ -8,6 +12,8 @@ github.com/gopherjs/gopherwasm v1.1.0 h1:fA2uLoctU5+T3OhOn2vYP0DVT6pxc7xhTlBB1pa
 github.com/gopherjs/gopherwasm v1.1.0/go.mod h1:SkZ8z7CWBz5VXbhJel8TxCmAcsQqzgWGR/8nMhyhZSI=
 github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d h1:VhgPp6v9qf9Agr/56bj7Y/xa04UccTW04VP0Qed4vnQ=
 github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d/go.mod h1:YUTz3bUH2ZwIWBy3CJBeOBEugqcmXREj14T+iG/4k4U=
+github.com/renanbastos93/crawler-covid19-rs v0.0.0-20200330015810-954247d4ceb3 h1:wWMIiQLQ9X/YXYqV69BBlV82NrycC/wGtUkSQ4YMrkE=
+github.com/renanbastos93/crawler-covid19-rs v0.0.0-20200330015810-954247d4ceb3/go.mod h1:qKHA3u0melcOhB39A5Cnc8y6tTwWD6fWTzl8dDP3pvU=
 github.com/tadvi/systray v0.0.0-20190226123456-11a2b8fa57af h1:6yITBqGTE2lEeTPG04SN9W+iWHCRyHqlVYILiSXziwk=
 github.com/tadvi/systray v0.0.0-20190226123456-11a2b8fa57af/go.mod h1:4F09kP5F+am0jAwlQLddpoMDM+iewkxxt6nxUQ5nq5o=
 golang.org/x/sys v0.0.0-20200302150141-5c8b2ff67527 h1:uYVVQ9WP/Ds2ROhcaGPeIdVq0RIXVLwsHlnvJ+cT1So=
