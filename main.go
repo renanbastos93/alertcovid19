@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gen2brain/beeep"
+	"github.com/renanbastos93/crawler-covid19-rs"
 )
 
 // Exported ...
@@ -89,9 +90,18 @@ func routine(sleep time.Duration) {
 	}
 }
 
-func flags(timer *time.Duration, state *string) {
+func getStateRSByCrawler() {
+	body := crawler.GetData()
+	cities, values := crawler.GetCityValue(body)
+	cities, values = crawler.ReplaceValue(cities, values)
+	list := crawler.SetCitiesValues(cities, values)
+	fmt.Printf("%+v :: xx", list)
+}
+
+func flags(timer *time.Duration, state *string, city *string) {
 	flag.DurationVar(timer, "t", time.Hour, "interval between each api request")
 	flag.StringVar(state, "state", "-", "Chose your filter state")
+	flag.StringVar(city, "city", "-", "Chose your filter city")
 	flag.Parse()
 }
 
@@ -103,7 +113,9 @@ func main() {
 	var (
 		timer time.Duration
 		state string
+		city  string
 	)
-	flags(&timer, &state)
+	flags(&timer, &state, &city)
 	routine(timer)
+	// getStateRSByCrawler()
 }
