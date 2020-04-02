@@ -7,10 +7,9 @@ import (
 	"time"
 
 	"github.com/renanbastos93/alertcovid19"
-	"github.com/renanbastos93/crawler-covid19-rs"
 )
 
-func filter(country, state, city string) (interface{}, string) {
+func filter(country, state, city string) (covid struct{}, f string) {
 	if city != "-" {
 		return
 	}
@@ -18,14 +17,18 @@ func filter(country, state, city string) (interface{}, string) {
 		return
 	}
 	if country != "-" {
-		return covid19.Country, country
+		x := new(covid19.Country)
+		log.Printf("\n\nopa :: %+v\n\n", x)
+		x.GetData(country, x)
+		return
 	}
+	return
 }
 
-func routine(sleep time.Duration, f interface{}, ff string) {
-	var cachedVal struct{}
+func routine(sleep time.Duration, covid struct{}, ff string) {
+	// var cachedVal struct{}
 	for {
-		f.Covid19.GetData(ff, cachedVal)
+		// covid19.GetData(ff, cachedVal)
 		log.Printf("sleeping for %s", sleep)
 		time.Sleep(sleep)
 	}
@@ -39,8 +42,6 @@ func flags(timer *time.Duration, country *string, city *string, state *string) {
 	flag.Parse()
 }
 
-type myFlags interface{}
-
 func main() {
 	log.SetPrefix(os.Args[0] + ": ")
 	log.SetFlags(0)
@@ -51,7 +52,7 @@ func main() {
 		city    string
 	)
 	flags(&timer, &country, &state, &city)
-	f, ff := filter(country, state, city)
-	routine(timer, f, ff)
+	filter(country, state, city)
+	// routine(timer, f, ff)
 	// getStateRSByCrawler()
 }
