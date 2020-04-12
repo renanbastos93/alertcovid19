@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"log"
 	"net/http"
 	"time"
@@ -54,10 +54,6 @@ func fetch(ctx context.Context, req *http.Request, ch chan LastValues) error {
 		log.Printf("fetchCOVID19Data: %v", err)
 		return err
 	}
-
-	bodyBytes, _ := ioutil.ReadAll(body.Body)
-	log.Println("WOOW: :: ", string(bodyBytes))
-
 	select {
 	case ch <- LastValues{r.Cases, r.Deaths, r.Recovered}:
 	case <-ctx.Done():
@@ -69,7 +65,6 @@ func fetch(ctx context.Context, req *http.Request, ch chan LastValues) error {
 func fetchCOVID19Data(ctx context.Context, country string) <-chan LastValues {
 	ch := make(chan LastValues)
 	url := URL + country
-	log.Println("URL ::: ", url)
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
 		panic("internal error - misuse of NewRequestWithContext")
@@ -84,7 +79,6 @@ func routine(sleep time.Duration, country string) {
 		ctx, cancel := context.WithTimeout(context.Background(), TIMEOUT)
 		select {
 		case newVal := <-fetchCOVID19Data(ctx, country):
-			log.Println("newval :: ", newVal)
 			if cachedVal != newVal {
 				err := beeep.Alert("COVID-19 "+country, newVal.String(), IMG)
 				if err != nil {
@@ -96,7 +90,6 @@ func routine(sleep time.Duration, country string) {
 			log.Printf("rountine: %v", ctx.Err())
 		}
 		cancel()
-		log.Printf("sleeping for %s", sleep)
 		time.Sleep(sleep)
 	}
 }
@@ -117,12 +110,11 @@ func getCountryByGeoIP() geoIP {
 	if err != nil {
 		log.Fatalf("Oops, we cannot get your location, please verify your network.")
 	}
-	log.Println("IP :: ", ip)
 	return ip
 }
 
 func main() {
-	// log.SetPrefix(os.Args[0] + ": ")
+	log.SetPrefix(os.Args[0] + ": ")
 	log.SetFlags(0)
 	var timer time.Duration
 	flag.DurationVar(&timer, "t", time.Hour, "interval between each api request")
