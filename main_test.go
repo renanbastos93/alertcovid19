@@ -18,11 +18,11 @@ func TestLastValues_String(t *testing.T) {
 		{
 			name: "Test format message to show in the notification",
 			fields: LastValues{
-				Confirmed: 100,
+				Cases:     100,
 				Deaths:    7,
 				Recovered: 1,
 			},
-			want: "Confirmed: 100, Deaths: 7, Recovered: 1",
+			want: "Cases: 100, Deaths: 7, Recovered: 1",
 		},
 	}
 	for _, v := range tests {
@@ -42,8 +42,8 @@ func TestFetch(t *testing.T) {
 		input io.Reader
 		want  bool
 	}{
-		{"ok json", strings.NewReader(`{"data": {"confirmed": 10, "deaths": 10, "recovered": 10}}`), true},
-		{"bad json", strings.NewReader(`{"data": "confirmed": 10, "deaths": 10, "recovered": 10}}`), false},
+		{"ok json", strings.NewReader(`{"data": {"cases": 10, "deaths": 10, "recovered": 10}}`), true},
+		{"bad json", strings.NewReader(`{"data": "cases": 10, "deaths": 10, "recovered": 10}}`), false},
 	}
 	for _, v := range tests {
 		v := v
