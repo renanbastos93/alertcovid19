@@ -45,13 +45,13 @@ func fetch(ctx context.Context, req *http.Request, ch chan CovidStatus) error {
 	var s CovidStatus
 	body, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Printf("fetchCOVID19Data: %v", err)
+		log.Printf("fetch: %v", err)
 		return err
 	}
 	defer body.Body.Close()
 	err = json.NewDecoder(body.Body).Decode(&s)
 	if err != nil {
-		log.Printf("fetchCOVID19Data: %v", err)
+		log.Printf("fetch: %v", err)
 		return err
 	}
 	select {
