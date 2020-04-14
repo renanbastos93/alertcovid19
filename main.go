@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"os"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gen2brain/beeep"
@@ -27,43 +27,42 @@ type geoIP struct {
 	Region      string `json:"region"`
 }
 
-// LastValues ...
-type LastValues struct {
+// CovidStatus has the number of cases, deaths and recovered patients
+type CovidStatus struct {
 	Cases     int `json:"cases"`
 	Deaths    int `json:"deaths"`
 	Recovered int `json:"recovered"`
 }
 
-func (l LastValues) String() string {
+func (s CovidStatus) String() string {
 	message := "Cases: %d, Deaths: %d, Recovered: %d"
-	return fmt.Sprintf(message, l.Cases, l.Deaths, l.Recovered)
+	return fmt.Sprintf(message, s.Cases, s.Deaths, s.Recovered)
 }
 
 // fetch runs on its own goroutine
-func fetch(ctx context.Context, req *http.Request, ch chan LastValues) error {
+func fetch(ctx context.Context, req *http.Request, ch chan CovidStatus) error {
 	defer close(ch)
-	var r LastValues
+	var s CovidStatus
 	body, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Printf("fetchCOVID19Data: %v", err)
+		log.Printf("fetch: %v", err)
 		return err
 	}
 	defer body.Body.Close()
-	err = json.NewDecoder(body.Body).Decode(&r)
+	err = json.NewDecoder(body.Body).Decode(&s)
 	if err != nil {
-		log.Printf("fetchCOVID19Data: %v", err)
+		log.Printf("fetch: %v", err)
 		return err
 	}
 	select {
-	case ch <- LastValues{r.Cases, r.Deaths, r.Recovered}:
+	case ch <- CovidStatus{s.Cases, s.Deaths, s.Recovered}:
 	case <-ctx.Done():
 	}
 	return nil
 }
 
-// fetchCOVID19Data ...
-func fetchCOVID19Data(ctx context.Context, country string) <-chan LastValues {
-	ch := make(chan LastValues)
+func fetchCovidStatus(ctx context.Context, country string) <-chan CovidStatus {
+	ch := make(chan CovidStatus)
 	url := URL + country
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
@@ -74,20 +73,20 @@ func fetchCOVID19Data(ctx context.Context, country string) <-chan LastValues {
 }
 
 func routine(sleep time.Duration, country string) {
-	cachedVal := LastValues{}
+	lastStatus := CovidStatus{}
 	for {
 		ctx, cancel := context.WithTimeout(context.Background(), TIMEOUT)
 		select {
-		case newVal := <-fetchCOVID19Data(ctx, country):
-			if cachedVal != newVal {
-				err := beeep.Alert("COVID-19 "+country, newVal.String(), IMG)
+		case newStatus := <-fetchCovidStatus(ctx, country):
+			if newStatus != lastStatus {
+				err := beeep.Alert("COVID-19 "+country, newStatus.String(), IMG)
 				if err != nil {
-					log.Printf("rountine: %v", err)
+					log.Printf("routine: %v", err)
 				}
-				cachedVal = newVal
+				lastStatus = newStatus
 			}
 		case <-ctx.Done():
-			log.Printf("rountine: %v", ctx.Err())
+			log.Printf("routine: %v", ctx.Err())
 		}
 		cancel()
 		time.Sleep(sleep)
