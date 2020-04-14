@@ -9,15 +9,15 @@ import (
 	"testing"
 )
 
-func TestLastValues_String(t *testing.T) {
+func TestCovidStatusString(t *testing.T) {
 	tests := []struct {
 		name   string
-		fields LastValues
+		fields CovidStatus
 		want   string
 	}{
 		{
 			name: "Test format message to show in the notification",
-			fields: LastValues{
+			fields: CovidStatus{
 				Cases:     100,
 				Deaths:    7,
 				Recovered: 1,
@@ -30,7 +30,7 @@ func TestLastValues_String(t *testing.T) {
 		t.Run(v.name, func(t *testing.T) {
 			t.Parallel()
 			if got := v.fields.String(); got != v.want {
-				t.Errorf("LastValues.String() = %v, want %v", got, v.want)
+				t.Errorf("CovidStatus.String() = %v, want %v", got, v.want)
 			}
 		})
 	}
@@ -57,7 +57,7 @@ func TestFetch(t *testing.T) {
 			if err != nil {
 				panic("misuse of NewRequest")
 			}
-			ch := make(chan LastValues)
+			ch := make(chan CovidStatus)
 			go func() { // drain the fetch output out
 				_ = <-ch
 			}()
