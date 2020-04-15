@@ -46,7 +46,7 @@ Dependencies for building:
 ## 👍 Contributing
 If you want to say **thank you** and/or support the active development of `AlertCovid19`:
 
-1. Add a [GitHub Star](https://github.com/renanbastos93/alertcovid19) to the project.
+1. Add a [GitHub Star](https://github.com/renanbastos93/alertcovid19/stargazers) to the project.
 2. Tweet about the project [on your Twitter](https://twitter.com/intent/tweet?text=%F0%9F%9A%80%20Alert%20COVID-19%20%E2%80%94%20was%20made%20in%20Golang%20to%20show%20push%20notification%20in%20your%20operating%20system%20with%20updates%20based%20on%20your%20geolocation).
 3. Write a review or tutorial on [Medium](https://medium.com/), [Dev.to](https://dev.to/) or personal blog.
 4. Help us to translate this `README` to another language.
