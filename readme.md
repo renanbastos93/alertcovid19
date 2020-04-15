@@ -3,6 +3,7 @@
 ![Gosec](https://github.com/renanbastos93/alertcovid19/workflows/Gosec/badge.svg)
 ![Go Test](https://github.com/renanbastos93/alertcovid19/workflows/Go%20Test/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/renanbastos93/alertcovid19)](https://goreportcard.com/report/github.com/renanbastos93/alertcovid19)
+
 This repository has the goal to create software to many platforms to run in one thread to validate each hour if we have new cases confirmed, deaths or recovered by COVID-19 in the world.
 
 
