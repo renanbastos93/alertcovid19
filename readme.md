@@ -1,4 +1,7 @@
-# Alert COVID-19
+# DEPPRECATED
+URLs were lost so I decided to archive the project.
+
+## Alert COVID-19
 ![Go Build](https://github.com/renanbastos93/alertcovid19/workflows/Go%20Build/badge.svg)
 ![Gosec](https://github.com/renanbastos93/alertcovid19/workflows/Gosec/badge.svg)
 ![Go Test](https://github.com/renanbastos93/alertcovid19/workflows/Go%20Test/badge.svg)
